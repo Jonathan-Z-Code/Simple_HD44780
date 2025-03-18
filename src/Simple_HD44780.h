@@ -60,19 +60,23 @@ public:
     static const unsigned char FIVE_BY_EIGHT_FONT = 1;
     static const unsigned char TWO_ROW_LCD_DISPLAY = 1;
     static const unsigned char ONE_ROW_LCD_DISPLAY = 0;
-    void disable_cursor();
-    void enable_cursor();
+    
+    void set_data(void);
+    void reset_gpio(void);
 
-    void enable_blinking();
-    void disable_blinking(); 
+    void disable_cursor(void);
+    void enable_cursor(void);
 
-    void disable_display();
-    void enable_display();
+    void enable_blinking(void);
+    void disable_blinking(void); 
 
-    void shift_display();
+    void disable_display(void);
+    void enable_display(void);
 
-    void write_char();
-    void write_string();
+    void shift_display(void);
+
+    void write_char(void);
+    void write_string(void);
 
     // ready-to-go commands for the HD44780
     const unsigned char CMD_CLEAR_DISPLAY       = 0x01;
