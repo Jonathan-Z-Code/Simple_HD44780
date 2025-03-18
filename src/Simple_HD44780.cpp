@@ -26,10 +26,10 @@ HD44780::HD44780(Config_1602 config_data) {
     global_config.db6 = config_data.db6;
     global_config.db5 = config_data.db5;
     global_config.db4 = config_data.db4;
-    global_config.db3 = config_data.db3;
-    global_config.db2 = config_data.db2;
-    global_config.db1 = config_data.db1;
-    global_config.db0 = config_data.db0;
+    // global_config.db3 = config_data.db3;
+    // global_config.db2 = config_data.db2;
+    // global_config.db1 = config_data.db1;
+    // global_config.db0 = config_data.db0;
     global_config.rw  = config_data.rw;
     global_config.rs  = config_data.rs;
     global_config.en  = config_data.en;
@@ -41,12 +41,21 @@ HD44780::HD44780(Config_1602 config_data) {
     global_config.char_font        = config_data.char_font;
 }
 
+// starts the initialization process of display
+void HD44780::begin(void) {
+    write_byte(CMD_CLEAR_DISPLAY);
+    write_byte(CMD_RETURN_CURSOR_HOME);
+}
+
+// toggles the enable pin in order to register data to LCD
 void HD44780::set_data(void) {
     digitalWrite(global_config.en, HIGH);
-    delayMicroseconds(100);
+    delayMicroseconds(1000);
     digitalWrite(global_config.en, LOW);
-    delayMicroseconds(100);
+    delayMicroseconds(1000);
 }
+
+// reset the data bits to start a write_byte command
 void HD44780::reset_gpio(void) {
     digitalWrite(global_config.db7, LOW);
     digitalWrite(global_config.db6, LOW);
@@ -54,23 +63,24 @@ void HD44780::reset_gpio(void) {
     digitalWrite(global_config.db4, LOW);
 }
 
+// writes one byte to the HD44780 controller
 void HD44780::write_byte(unsigned char cmd) {
     // break cmd down into two seperate 4-bit values
     unsigned char lower_nibble = (cmd & 0x0F);
     unsigned char upper_nibble = (cmd & 0xF0) >> 4;
     // reset data line and register the upper_nibble to the LCD
     reset_gpio();
-    if(upper_nibble & 0x01) digitalWrite(global_config.db7, HIGH);
-    if(upper_nibble & 0x02) digitalWrite(global_config.db6, HIGH);
-    if(upper_nibble & 0x04) digitalWrite(global_config.db5, HIGH);
-    if(upper_nibble & 0x08) digitalWrite(global_config.db4, HIGH);
+    if(upper_nibble & 0x08) digitalWrite(global_config.db7, HIGH);
+    if(upper_nibble & 0x04) digitalWrite(global_config.db6, HIGH);
+    if(upper_nibble & 0x02) digitalWrite(global_config.db5, HIGH);
+    if(upper_nibble & 0x01) digitalWrite(global_config.db4, HIGH);
     set_data();
     // reset data line again and register the lower_nibble to the LCD
     reset_gpio();
-    if(lower_nibble & 0x01) digitalWrite(global_config.db7, HIGH);
-    if(lower_nibble & 0x02) digitalWrite(global_config.db6, HIGH);
-    if(lower_nibble & 0x04) digitalWrite(global_config.db5, HIGH);
-    if(lower_nibble & 0x08) digitalWrite(global_config.db4, HIGH);
+    if(lower_nibble & 0x08) digitalWrite(global_config.db7, HIGH);
+    if(lower_nibble & 0x04) digitalWrite(global_config.db6, HIGH);
+    if(lower_nibble & 0x02) digitalWrite(global_config.db5, HIGH);
+    if(lower_nibble & 0x01) digitalWrite(global_config.db4, HIGH);
     set_data();
 }
 

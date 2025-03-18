@@ -14,10 +14,10 @@ public:
         unsigned char db6;
         unsigned char db5;
         unsigned char db4;
-        unsigned char db3;
-        unsigned char db2;
-        unsigned char db1;
-        unsigned char db0;
+        // unsigned char db3;
+        // unsigned char db2;
+        // unsigned char db1;
+        // unsigned char db0;
         unsigned char rw;
         unsigned char rs;
         unsigned char en;
@@ -33,36 +33,22 @@ public:
         unsigned char display_line;
         // 1 means 5x10 char font, 0 means 5x8 char font 
         unsigned char char_font; 
-    } config;
+    } Config_1602;
 
     // default settings enabled if user does not define settings
-    HD44780::HD44780();
+    HD44780(void);
     // if user has desired settings, implement this constructor
-    HD44780::HD44780(Config_1602 config_data);
-        // IF display_shift = true ;
-        // true means increment , false means decrement 
-        // IF display_shift = false ;
-        // nothing happens
-        bool incr;
-        // true means display shifts, false means no shifting! 
-        bool display_shift;
+    HD44780(Config_1602 config_data);
 
-    // configuration settings
-    static const unsigned char DISABLE_CURSOR = 1;
-    static const unsigned char ENABLE_CURSOR = 0;
-    static const unsigned char ENABLE_BLINKING = 1;
-    static const unsigned char DISABLE_BLINKING = 0;
-    static const unsigned char ENABLE_DISPLAY = 1;
-    static const unsigned char DISABLE_DISPLAY = 0;
-    static const unsigned char EIGHT_BIT_DATA_LENGTH = 1;
-    static const unsigned char FOUR_BIT_DATA_LENGTH = 0;
-    static const unsigned char FIVE_BY_TEN_FONT = 0;
-    static const unsigned char FIVE_BY_EIGHT_FONT = 1;
-    static const unsigned char TWO_ROW_LCD_DISPLAY = 1;
-    static const unsigned char ONE_ROW_LCD_DISPLAY = 0;
-    
-    void set_data(void);
-    void reset_gpio(void);
+    // IF display_shift = true ;
+    // true means increment , false means decrement 
+    // IF display_shift = false ;
+    // nothing happens
+    bool incr;
+    // true means display shifts, false means no shifting! 
+    bool display_shift;
+
+    void begin(void);
 
     void disable_cursor(void);
     void enable_cursor(void);
@@ -77,6 +63,31 @@ public:
 
     void write_char(void);
     void write_string(void);
+
+    // configuration macros
+    static const unsigned char DISABLE_CURSOR = 1;
+    static const unsigned char ENABLE_CURSOR = 0;
+    static const unsigned char ENABLE_BLINKING = 1;
+    static const unsigned char DISABLE_BLINKING = 0;
+    static const unsigned char ENABLE_DISPLAY = 1;
+    static const unsigned char DISABLE_DISPLAY = 0;
+    static const unsigned char EIGHT_BIT_DATA_LENGTH = 1;
+    static const unsigned char FOUR_BIT_DATA_LENGTH = 0;
+    static const unsigned char FIVE_BY_TEN_FONT = 0;
+    static const unsigned char FIVE_BY_EIGHT_FONT = 1;
+    static const unsigned char TWO_ROW_LCD_DISPLAY = 1;
+    static const unsigned char ONE_ROW_LCD_DISPLAY = 0;
+    
+private:
+
+    /* create a private version of the config struct to keep 
+       track of user-defined changes
+    */
+    Config_1602 global_config;
+
+    void set_data(void);
+    void reset_gpio(void);
+    void write_byte(unsigned char command);
 
     // ready-to-go commands for the HD44780
     const unsigned char CMD_CLEAR_DISPLAY       = 0x01;
@@ -93,14 +104,6 @@ public:
     const unsigned char POS_DATA_LENGTH             = 0x10;
     const unsigned char POS_DISPLAY_LINE            = 0x08;
     const unsigned char POS_CHARACTER_FONT          = 0x04;
-
-private:
-
-    // create a private version of the config struct to keep
-    // track of user-defined changes
-    Config_1602 global_config;
-
-    void write_byte(unsigned char command);
 
 };
 
