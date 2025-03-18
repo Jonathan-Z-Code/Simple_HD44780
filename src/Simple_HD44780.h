@@ -2,7 +2,7 @@
 #define SIMPLE_HD44780_H_
 
 // setting to print out debug information
-#define HD44780_PRINT_DEBUG_INFO (1) 
+#define HD44780_PRINT_DEBUG_INFO (0) 
 
 class HD44780 {
     
@@ -47,9 +47,9 @@ public:
     // true means increment , false means decrement 
     // IF display_shift = false ;
     // nothing happens
-    bool incr;
+    // bool incr;
     // true means display shifts, false means no shifting! 
-    bool display_shift;
+    // bool display_shift;
 
     void begin(void);
 
