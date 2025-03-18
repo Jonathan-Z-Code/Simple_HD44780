@@ -1,25 +1,25 @@
 #include "Simple_HD44780.h"
 #include <Arduino.h>
-// default global settings, can be overridden via two methods
+
+// Here are the default global settings, can be overridden via two methods
 // METHOD 1: Give a Config_1602 struct to the constructor
 // METHOD 2: call disable_x or enable_x functions in order to change the global_config struct
-HD44780::Config_1602 global_config = {
-    .db7 = 4,
-    .db6 = 3,
-    .db5 = 2,
-    .db4 = 1,
-    .rw  = 5,
-    .rs  = 6,
-    .en  = 7,
-    .display_on       = 0,
-    .cursor_on        = 0,
-    .blinking_cursor  = 0,
-    .data_length      = 0,
-    .display_line     = 0,
-    .char_font        = 0,
-};
+HD44780::HD44780() {
+    global_config.db7 = 7;
+    global_config.db6 = 6;
+    global_config.db5 = 5;
+    global_config.db4 = 4;
+    global_config.rw  = 5;
+    global_config.rs  = 6;
+    global_config.en  = 3;
+    global_config.display_on       = HD44780::ENABLE_DISPLAY;
+    global_config.cursor_on        = HD44780::ENABLE_CURSOR;
+    global_config.blinking_cursor  = HD44780::ENABLE_BLINKING;
+    global_config.data_length      = HD44780::FOUR_BIT_DATA_LENGTH;
+    global_config.display_line     = HD44780::TWO_LINE_LCD_DISPLAY;
+    global_config.char_font        = HD44780::FIVE_BY_EIGHT_FONT;
+}
 
-HD44780::HD44780() {}
 HD44780::HD44780(Config_1602 config_data) {
     // update global_config data with user-defined preferences
     global_config.db7 = config_data.db7;
@@ -43,14 +43,46 @@ HD44780::HD44780(Config_1602 config_data) {
 
 // starts the initialization process of display
 void HD44780::begin(void) {
-    write_byte(CMD_CLEAR_DISPLAY);
-    write_byte(CMD_RETURN_CURSOR_HOME);
+    
+    // init all GPIO pins as necessary
+    pinMode(global_config.db7, OUTPUT);
+    pinMode(global_config.db6, OUTPUT);
+    pinMode(global_config.db5, OUTPUT);
+    pinMode(global_config.db4, OUTPUT);
+    pinMode(global_config.rs, OUTPUT);
+    pinMode(global_config.rw, OUTPUT);
+    pinMode(global_config.en, OUTPUT);
+
+    // wait for GPIO data bus to settle
+    delayMicroseconds(250);
+
+    // set configuration bits as necessary
+    if(global_config.data_length)       cmd_function_set |= DATA_LENGTH_MSK;
+    if(global_config.display_line)      cmd_function_set |= DISPLAY_LINE_MSK;
+    if(global_config.char_font)         cmd_function_set |= CHARACTER_FONT_MSK;
+
+    if(global_config.display_on)        cmd_display_control |= DISPLAY_ON_OFF_MSK;
+    if(global_config.cursor_on)         cmd_display_control |= CURSOR_ON_OFF_MSK;
+    if(global_config.blinking_cursor)   cmd_display_control |= BLINKING_CURSOR_MSK;
+    
+    #if HD44780_PRINT_DEBUG_INFO
+        Serial.println(cmd_function_set, HEX);
+        Serial.println(cmd_display_control, HEX);
+    #endif
+
+    // write initialization bytes to the HD44780
+    //write_nibble(0);
+    write_byte(cmd_function_set);
+    write_byte(cmd_display_control);
+    write_byte(cmd_clear_display);
+    write_byte(cmd_return_home);
+
 }
 
 // toggles the enable pin in order to register data to LCD
 void HD44780::set_data(void) {
     digitalWrite(global_config.en, HIGH);
-    delayMicroseconds(1000);
+    delayMicroseconds(1000); // delay time can be optimized
     digitalWrite(global_config.en, LOW);
     delayMicroseconds(1000);
 }
@@ -81,6 +113,15 @@ void HD44780::write_byte(unsigned char cmd) {
     if(lower_nibble & 0x04) digitalWrite(global_config.db6, HIGH);
     if(lower_nibble & 0x02) digitalWrite(global_config.db5, HIGH);
     if(lower_nibble & 0x01) digitalWrite(global_config.db4, HIGH);
+    set_data();
+}
+
+void HD44780::write_nibble(unsigned char nibble) {
+    reset_gpio();
+    digitalWrite(global_config.db7, LOW);
+    digitalWrite(global_config.db6, LOW);
+    digitalWrite(global_config.db5, HIGH);
+    digitalWrite(global_config.db4, LOW);
     set_data();
 }
 

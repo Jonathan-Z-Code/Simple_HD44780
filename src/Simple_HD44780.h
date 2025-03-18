@@ -1,6 +1,9 @@
 #ifndef SIMPLE_HD44780_H_
 #define SIMPLE_HD44780_H_
 
+// setting to print out debug information
+#define HD44780_PRINT_DEBUG_INFO (1) 
+
 class HD44780 {
     
 public:
@@ -65,19 +68,19 @@ public:
     void write_string(void);
 
     // configuration macros
-    static const unsigned char DISABLE_CURSOR = 1;
-    static const unsigned char ENABLE_CURSOR = 0;
-    static const unsigned char ENABLE_BLINKING = 1;
+    static const unsigned char DISABLE_CURSOR = 0;
+    static const unsigned char ENABLE_CURSOR = 1;
     static const unsigned char DISABLE_BLINKING = 0;
-    static const unsigned char ENABLE_DISPLAY = 1;
+    static const unsigned char ENABLE_BLINKING = 1;
     static const unsigned char DISABLE_DISPLAY = 0;
-    static const unsigned char EIGHT_BIT_DATA_LENGTH = 1;
+    static const unsigned char ENABLE_DISPLAY = 1;
     static const unsigned char FOUR_BIT_DATA_LENGTH = 0;
-    static const unsigned char FIVE_BY_TEN_FONT = 0;
-    static const unsigned char FIVE_BY_EIGHT_FONT = 1;
-    static const unsigned char TWO_ROW_LCD_DISPLAY = 1;
-    static const unsigned char ONE_ROW_LCD_DISPLAY = 0;
-    
+    static const unsigned char EIGHT_BIT_DATA_LENGTH = 1;
+    static const unsigned char FIVE_BY_EIGHT_FONT = 0;
+    static const unsigned char FIVE_BY_TEN_FONT = 1;
+    static const unsigned char ONE_LINE_LCD_DISPLAY = 0;
+    static const unsigned char TWO_LINE_LCD_DISPLAY = 1;
+
 private:
 
     /* create a private version of the config struct to keep 
@@ -88,22 +91,27 @@ private:
     void set_data(void);
     void reset_gpio(void);
     void write_byte(unsigned char command);
+    void write_nibble(unsigned char nibble);
+    
+    // custom commands for initialization 
+    unsigned char cmd_function_set = 0x20;
+    unsigned char cmd_display_control = 0x08;
 
     // ready-to-go commands for the HD44780
-    const unsigned char CMD_CLEAR_DISPLAY       = 0x01;
-    const unsigned char CMD_RETURN_CURSOR_HOME  = 0x02; 
+    const unsigned char cmd_clear_display = 0x01;
+    const unsigned char cmd_return_home   = 0x02; 
 
     // bit positions for all configuration settings
-    const unsigned char POS_INCR_DECR               = 0x02;
-    const unsigned char POS_DISPLAY_SHIFT           = 0x01;
-    const unsigned char POS_DISPLAY_ON_OFF          = 0x04;
-    const unsigned char POS_CURSOR_ON_OFF           = 0x02;
-    const unsigned char POS_BLINKING_CURSOR         = 0x01;
-    const unsigned char POS_CURSOR_OR_DISPLAY_SHIFT = 0x08;
-    const unsigned char POS_SHIFT_RIGHT_LEFT        = 0x04;
-    const unsigned char POS_DATA_LENGTH             = 0x10;
-    const unsigned char POS_DISPLAY_LINE            = 0x08;
-    const unsigned char POS_CHARACTER_FONT          = 0x04;
+    const unsigned char INCR_DECR_MSK               = 0x02;
+    const unsigned char DISPLAY_SHIFT_MSK           = 0x01;
+    const unsigned char DISPLAY_ON_OFF_MSK          = 0x04;
+    const unsigned char CURSOR_ON_OFF_MSK           = 0x02;
+    const unsigned char BLINKING_CURSOR_MSK         = 0x01;    
+    const unsigned char CURSOR_OR_DISPLAY_SHIFT_MSK = 0x08;
+    const unsigned char SHIFT_RIGHT_LEFT_MSK        = 0x04;
+    const unsigned char DATA_LENGTH_MSK             = 0x10;
+    const unsigned char DISPLAY_LINE_MSK            = 0x08;
+    const unsigned char CHARACTER_FONT_MSK          = 0x04;
 
 };
 

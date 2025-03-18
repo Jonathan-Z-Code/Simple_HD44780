@@ -25,6 +25,7 @@ HD44780::Config_1602 data_config {
 // HD44780 lcd(data_config);
 
 void setup(void) {
+  Serial.begin(9600);
   lcd.begin();
 }
 
