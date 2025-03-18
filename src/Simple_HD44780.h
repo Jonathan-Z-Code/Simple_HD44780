@@ -41,7 +41,7 @@ public:
     // default settings enabled if user does not define settings
     HD44780(void);
     // if user has desired settings, implement this constructor
-    HD44780(Config_1602 config_data);
+    HD44780(Config_1602* config_data);
 
     // IF display_shift = true ;
     // true means increment , false means decrement 

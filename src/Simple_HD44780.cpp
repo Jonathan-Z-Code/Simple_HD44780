@@ -9,8 +9,8 @@ HD44780::HD44780() {
     global_config.db6 = 6;
     global_config.db5 = 5;
     global_config.db4 = 4;
-    global_config.rw  = 5;
-    global_config.rs  = 6;
+    global_config.rw  = 2;
+    global_config.rs  = 1;
     global_config.en  = 3;
     global_config.display_on       = HD44780::ENABLE_DISPLAY;
     global_config.cursor_on        = HD44780::ENABLE_CURSOR;
@@ -20,8 +20,13 @@ HD44780::HD44780() {
     global_config.char_font        = HD44780::FIVE_BY_EIGHT_FONT;
 }
 
-HD44780::HD44780(Config_1602 config_data) {
+HD44780::HD44780(Config_1602* config_data) {
     // update global_config data with user-defined preferences
+    
+    // test this method of copying data from user-defined preferences
+    memcpy(&global_config, config_data, sizeof(Config_1602));
+    
+    /*
     global_config.db7 = config_data.db7;
     global_config.db6 = config_data.db6;
     global_config.db5 = config_data.db5;
@@ -39,6 +44,7 @@ HD44780::HD44780(Config_1602 config_data) {
     //global_config.data_length      = config_data.data_length;
     global_config.display_line     = config_data.display_line;
     global_config.char_font        = config_data.char_font;
+*/
 }
 
 // starts the initialization process of display
